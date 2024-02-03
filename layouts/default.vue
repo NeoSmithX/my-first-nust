@@ -1,30 +1,26 @@
 <template>
     <div>
         <header>
-            <!-- Top Bar Content -->
             <p top-bar-content>My Top Bar</p>
             <nav>
-                <!-- NuxtLink for navigation -->
-                <!-- <NuxtLink to="/">Home</NuxtLink> -->
                 <NuxtLink to="/test" class="nav-button">Test</NuxtLink> &nbsp;
                 <NuxtLink to="/" class="nav-button">Home</NuxtLink> &nbsp;
-               
-
-
             </nav>
-            <!-- <WalletConnector  /> -->
+
             <div class="wallet-connector">
                 <WalletConnector />
             </div>
         </header>
+        <slot />
+        <!-- <main> -->
+            <!-- word -->
+            <!-- <NuxtPage /> -->
+        <!-- </main> -->
+        <footer>
 
-        <!-- Main content where Nuxt.js will inject page content -->
-        <Nuxt />
+            <p>&copy; 2024 Simple Inscritpion by Neo</p>
+        </footer>
     </div>
-    <footer>
-        <!-- Footer content goes here -->
-        <p>&copy; 2024 Simple Inscritpion by Neo</p>
-    </footer>
 </template>
   
 <script>
@@ -51,10 +47,11 @@ export default {
 }
 
 /* .header-content { */
-    /* Styles for your header content */
+/* Styles for your header content */
 /* } */
 
 .wallet-connector {
     margin-left: auto;
     /* Additional styles for your wallet connector button, if needed */
-}</style>
+}
+</style>
