@@ -1,8 +1,10 @@
 <template>
-    
-    <NuxtLayout>
-        <div>
+    <div >
+        <NuxtLayout>
+        <!-- <div> -->
             <p>Home page</p>
-        </div>
+        <!-- </div> -->
     </NuxtLayout>
+    </div>
+    
 </template>
