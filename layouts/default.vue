@@ -1,10 +1,11 @@
 <template>
     <div>
         <header>
-            <p top-bar-content>My Top Bar</p>
+            <p top-bar-content>Step to Real Scenario with Inscription</p>
             <nav>
-                <NuxtLink to="/test" class="nav-button">Test</NuxtLink> &nbsp;
                 <NuxtLink to="/" class="nav-button">Home</NuxtLink> &nbsp;
+                <NuxtLink to="/deploy-question" class="nav-button">Deploy</NuxtLink> &nbsp;
+                <NuxtLink to="/mint-answer" class="nav-button">Mint</NuxtLink> &nbsp;
             </nav>
 
             <div class="wallet-connector">

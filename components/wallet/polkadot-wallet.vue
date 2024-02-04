@@ -11,7 +11,7 @@
     </button>
 
     <div v-if="isConnected && accounts.length">
-      <select v-model="selectedAccountAddress" @change="finalizeConnection">
+      <select v-model="selectedAccountAddress" @change="handleFinalizeConnection">
         <option v-for="account in accounts" :key="account.address" :value="account.address">
           {{ account.name }} ({{ account.address }})
         </option>
@@ -24,84 +24,44 @@
     </div>
   </div>
 </template>
-  
-<script>
-import { defineComponent, reactive , provide} from 'vue';
 
-export default {
-  data() {
-    // init the global stateGlobal
-    // const stateGlobal = reactive({
-    //   selectedWallet: 'subwallet-js',
-    //   isConnected: false,
-    //   accounts: [],
-    //   selectedAccountAddress: '',
-    //   selectedAccount: null,
-    // });
-    // provide('polkadotWalletState', stateGlobal);
-    // provide('polkadotWalletState', stateGlobal);
-    // const stateGlobal = inject('polkadotWalletState');
-    // this.stateGlobal = stateGlobal;
-    return {
-      selectedWallet: 'subwallet-js',
-      isConnected: false,
-      accounts: [],
-      selectedAccountAddress: '',
-      selectedAccount: null,
-    };
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useWalletStore } from '@/stores/polkadot-wallet';
+import { storeToRefs } from 'pinia';
+import App from '~/app.vue'
+import { createPinia } from 'pinia';
+import { createApp } from 'vue'
+const pinia = createPinia()
+const app = createApp(App)
+app.use(pinia)
+const store = useWalletStore();
 
-    //
-  },
-  computed: {
-    selectedWalletName() {
-      const walletNames = {
-        'subwallet-js': 'SubWallet',
-        'polkadot-js': 'Polkadot{.js}',
-        'talisman': 'Talisman',
-      };
-      return walletNames[this.selectedWallet];
-    },
-  },
-  methods: {
-    async connectWallet() {
-      if (typeof window !== 'undefined' && window.injectedWeb3 && window.injectedWeb3[this.selectedWallet]) {
-        try {
-          const walletExtension = window.injectedWeb3[this.selectedWallet];
-          const extension = await walletExtension.enable();
-          const accounts = await extension.accounts.get();
-          if (accounts.length > 0) {
-            this.accounts = accounts;
-            this.isConnected = true;
-          } else {
-            alert('No accounts found.');
-          }
-        } catch (error) {
-          console.error(`Failed to connect to ${this.selectedWalletName}:`, error);
-        }
-      } else {
-        alert(`${this.selectedWalletName} extension not found.`);
-      }
-    },
-    finalizeConnection() {
-      this.selectedAccount = this.accounts.find(account => account.address === this.selectedAccountAddress);
-      console.log('Account finalized:', this.selectedAccount);
-      // Additional logic after account selection
-      this.stateGlobal.selectedAccount = this.selectedAccount;
-    },
-    // provide('walletState', stateGlobal);
-    disconnectWallet() {
-      this.isConnected = false;
-      this.accounts = [];
-      this.selectedAccountAddress = '';
-      this.selectedAccount = null;
-      // Additional logic for disconnecting or deauthorizing the app might be necessary
-    },
-    resetConnection() {
-      this.disconnectWallet();
-    },
 
-  },
+// const store = useWalletStore();
 
-};
+// Use storeToRefs for reactive state properties
+const { isConnected, accounts, selectedAccount, selectedWallet, selectedAccountAddress, selectedWalletName } = storeToRefs(store);
+
+// Access actions directly from the store
+const { connectWallet, disconnectWallet, finalizeConnection, resetConnection } = store;
+
+// Computed properties for v-model bindings or other reactive transformations
+const selectedWalletModel = computed({
+  get: () => selectedWallet.value,
+  set: (value) => { store.selectedWallet = value; },
+});
+
+const selectedAccountAddressModel = computed({
+  get: () => selectedAccountAddress.value,
+  set: (value) => { store.finalizeConnection(value); },
+});
+function handleFinalizeConnection(event: Event) {
+  // Extracting the value from the event target (which is the select element)
+  const selectedValue = (event.target as HTMLSelectElement).value;
+  finalizeConnection(selectedValue);
+  console.log('connected account: ', selectedValue);
+}
+// Now, you can use connectWallet, disconnectWallet, and finalizeConnection directly in your template or script without errors.
 </script>
-  
+

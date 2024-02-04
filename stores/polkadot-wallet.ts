@@ -1,48 +1,80 @@
 // stores/wallet.ts
 import { defineStore } from 'pinia';
-import { web3FromAddress } from '@polkadot/extension-dapp';
-import { ref } from 'vue';
-// import type { Account, WalletState } from '@/types'; // Adjust the import path as needed
+import { web3Enable, web3Accounts } from '@polkadot/extension-dapp';
+
 interface Account {
   address: string;
-  name: string;
+  name:string
+  // meta: {
+  //   name?: string;
+  // };
 }
 
-interface WalletState {
-  selectedWallet: string;
-  isConnected: boolean;
-  accounts: Account[];
-  selectedAccount: Account | null;
-}
-export const usePolkadotWalletStore = defineStore('wallet', {
-  state: (): WalletState => ({
-    selectedWallet: '',
+export const useWalletStore = defineStore('wallet', {
+  state: () => ({
+    selectedWallet: 'subwallet-js',
     isConnected: false,
-    accounts: [],
-    selectedAccount: null,
+    accounts: [] as Account[],
+    selectedAccount: null as Account | null,
+    selectedAccountAddress: '',
   }),
+  getters: {
+    selectedWalletName: (state) => {
+      const walletNames: Record<string, string> = {
+        'subwallet-js': 'SubWallet',
+        'polkadot-js': 'Polkadot{.js}',
+        'talisman': 'Talisman',
+      };
+      return walletNames[state.selectedWallet];
+    },
+  },
+
   actions: {
     async connectWallet() {
-      console.log('Connecting to wallet...');
-      this.isConnected = true;
-      // Simulate fetching accounts
-      this.accounts = [{ address: '5...', name: 'Account 1' }];
-      this.selectedAccount = this.accounts[0];
+      const selectedWallet = this.selectedWallet; // Assign to a local variable
+      if (typeof window !== 'undefined' && (window as any).injectedWeb3 && (window as any).injectedWeb3[selectedWallet]) {
+        // Now use 'selectedWallet' directly
+        try {
+          const walletExtension = (window as any).injectedWeb3[selectedWallet];
+          const extension = await walletExtension.enable();
+          const accounts = await extension.accounts.get();
+          if (accounts.length > 0) {
+            this.accounts = accounts.map((account: { address: any; name: any; }) => {
+              // console.log('account', account)
+              return ({
+              
+                address: account.address,
+                // name: account.name,
+                name: account.name, // Assuming 'meta' exists on the account
+              })
+            }
+            
+            );
+            this.isConnected = true;
+          } else {
+            alert('No accounts found.');
+          }
+        } catch (error) {
+          console.error(`Failed to connect to the wallet:`, error);
+        }
+      } else {
+        alert(`Wallet extension for '${selectedWallet}' not found.`);
+      }
     },
-
+    finalizeConnection(selectedAccountAddress: string) {
+      const account = this.accounts.find(acc => acc.address === selectedAccountAddress);
+      if (account) {
+        this.selectedAccount = account;
+        this.selectedAccountAddress = selectedAccountAddress;
+      }
+    },
     disconnectWallet() {
+      // Resets the state as before
       this.isConnected = false;
       this.accounts = [];
       this.selectedAccount = null;
+      this.selectedAccountAddress = '';
     },
-
-    selectAccount(address: string) {
-      const account = this.accounts.find(acc => acc.address === address);
-      if (account) {
-        this.selectedAccount = account;
-      }
-    },
-
     resetConnection() {
       this.disconnectWallet();
     },

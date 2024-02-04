@@ -42,6 +42,7 @@
 import { ref, watchEffect } from 'vue';
 import { onMounted, inject } from 'vue';
 import { useNuxtApp } from '#app';
+import {useWalletStore} from  '@/stores/polkadot-wallet';
 // import { usePolkadotWalletStore } from '@/stores/polkadot-wallet';
 // import { web3Enable, web3FromAddress } from '@polkadot/extension-dapp';
 // import { computed } from 'vue';
@@ -56,7 +57,7 @@ export default {
         const { $polkadotApi } = useNuxtApp();
         // const { $polkadotWalletState } = useNuxtApp();
         // console.log('polkadotWalletState', $polkadotWalletState);
-        const polkadotWalletState = inject('polkadotWalletState');
+        // const polkadotWalletState = inject('polkadotWalletState');
         // const polkadotWalletStore = usePolkadotWalletStore(); 
         // const signer = computed(() => {
         //     if (walletStore.selectedAccount) {
@@ -97,7 +98,10 @@ export default {
         const sendTransaction = async () => {
             console.log('Trying to send transaction');
             
-        console.log('polkadotWalletState', polkadotWalletState);
+        // console.log('polkadotWalletState', polkadotWalletState);
+            const walletStore = useWalletStore();
+            console.log('walletStore', walletStore.selectedAccount);
+            const selectedAccount = walletStore.selectedAccount;
             // const polkadotWallet =  useNuxtApp().vueApp.component('polkadotWallet');
             // console.log('polkadotWallet', polkadotWallet);
             // const selectedAccount = inject('selectedAccount');
@@ -107,7 +111,7 @@ export default {
             // console.log('selectedAccount', selectedAccount);
             // const x = polkadotWallet.selectedWalletName
             // console.log('x', x)
-            return
+            // return
             // const injector = await web3FromAddress(polkadotWalletStore.selectedAccount.address);
             // if (!window.injectedWeb3['subwallet-js']) {
             //     console.error("SubWallet extension not found");
@@ -133,13 +137,15 @@ export default {
 
                 // Create a remark transaction
                 const tx = $polkadotApi.tx.system.remark(JSON.stringify('123'));
-
+                const wallet = walletStore.selectedWallet
+                const walletExtension = window.injectedWeb3[wallet]
+                const extension = await walletExtension.enable()
                 // Sign and send the transaction
                 // Replace `YOUR_ACCOUNT_ADDRESS` with the sender's account address
                 // and `signer` with an instance of the account's signer
 
-                console.log('injector.selectedAccount', injector.selectedAccount);
-                const unsub = await tx.signAndSend(injector.selectedAccount.address, { signer: injector.selectedAccount.address.signer }, ({ status }) => {
+                // console.log('injector.selectedAccount', injector.selectedAccount);
+                const unsub = await tx.signAndSend(selectedAccount.address, { signer: extension.signer }, ({ status }) => {
                     if (status.isInBlock) {
                         console.log(`Transaction included at blockHash ${status.asInBlock}`);
                         unsub();
