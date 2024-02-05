@@ -1,7 +1,13 @@
 <template>
     <div>
         <header>
-            <p top-bar-content>Step to Real Scenario with Inscription</p>
+            
+            <p id = 'pageTitle'>Step to Real Scenario with Inscription</p>
+            <div  id ='polkadotWallet'> 
+                <!-- //class="wallet-connector", -->
+                <WalletConnector />
+            </div>
+            <br><br>
             <nav>
                 <NuxtLink to="/" class="nav-button">Home</NuxtLink> &nbsp;
                 <NuxtLink to="/deploy-question" class="nav-button">Deploy</NuxtLink> &nbsp;
@@ -9,9 +15,8 @@
                 <NuxtLink to="/test" class="nav-button">Test Code</NuxtLink> &nbsp;
             </nav>
 
-            <div class="wallet-connector">
-                <WalletConnector />
-            </div>
+           
+            
         </header>
         <slot />
         <!-- <main> -->
@@ -56,4 +61,17 @@ export default {
     margin-left: auto;
     /* Additional styles for your wallet connector button, if needed */
 }
+
+#polkadotWallet div {
+  text-align: right;
+  float: right;
+  clear: none;
+  /* width:20px; */
+}
+/* #pageTitle p {
+  text-align: middle;
+  float: middle;
+  clear: none;
+  /* width:20px; */
+/* } */
 </style>
