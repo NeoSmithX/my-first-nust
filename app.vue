@@ -15,6 +15,14 @@
 </template>
 
 <script>
+// import { useUserStore } from '@/stores/user'
+// import { createPinia } from 'pinia';
+// import { createApp } from 'vue'
+// import App from './App.vue'
+// const pinia = createPinia()
+// const app = createApp(App)
+// app.use(pinia)
+
 export default {
   name: 'App',
   // Global component registration can be handled here if needed, but plugins are preferred

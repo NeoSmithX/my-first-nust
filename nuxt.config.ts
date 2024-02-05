@@ -7,7 +7,14 @@ export default defineNuxtConfig({
     { src: '~/plugins/polkadot-wallet.ts', mode: 'client' }, 
     
   ],
+  // css: ['~/assets/css/tailwind.css'],
+  // build: {
+  //   postcss: {
+  //     postcssOptions: require('./postcss.config.js'), // Optional: only if you have other PostCSS config
+  //   },
+  // },
   modules: [
+    '@pinia/nuxt',
     // '@nuxtjs/dotenv',
   ],
 })

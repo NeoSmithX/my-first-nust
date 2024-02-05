@@ -30,6 +30,15 @@ export const useWalletStore = defineStore('wallet', {
   },
 
   actions: {
+    initializeStore() {
+      const isConnected = localStorage.getItem('isConnected') === 'true';
+      const selectedWallet = localStorage.getItem('selectedWallet');
+      if (isConnected && selectedWallet) {
+        this.isConnected = isConnected;
+        this.selectedWallet = selectedWallet;
+        // Optionally, re-establish the connection or validate it here
+      }
+    },
     async connectWallet() {
       const selectedWallet = this.selectedWallet; // Assign to a local variable
       if (typeof window !== 'undefined' && (window as any).injectedWeb3 && (window as any).injectedWeb3[selectedWallet]) {
