@@ -33,7 +33,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
-import adminWhitelistAddress from '~/private-data/admin-whitelist-address'
+const adminWhitelistAddress = JSON.parse(process.env.adminList);
 const selectedSpace = ref('');
 const selectedQuestionId = ref('');
 const selectedQuestion = ref('');
