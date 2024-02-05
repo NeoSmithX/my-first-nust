@@ -6,6 +6,7 @@
                 <NuxtLink to="/" class="nav-button">Home</NuxtLink> &nbsp;
                 <NuxtLink to="/deploy-question" class="nav-button">Deploy</NuxtLink> &nbsp;
                 <NuxtLink to="/mint-answer" class="nav-button">Mint</NuxtLink> &nbsp;
+                <NuxtLink to="/test" class="nav-button">Test Code</NuxtLink> &nbsp;
             </nav>
 
             <div class="wallet-connector">

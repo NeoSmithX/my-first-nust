@@ -4,6 +4,7 @@
         <!-- <div> -->
             <p>Home page</p>
         <!-- </div> -->
+        
     </NuxtLayout>
     </div>
     
