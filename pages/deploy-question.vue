@@ -33,7 +33,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
-// console.log('env',useRuntimeConfig())
+console.log('env',useRuntimeConfig())
 const adminWhitelistAddress = JSON.parse(useRuntimeConfig().public.PUBLIC_adminList);
 // const adminWhitelistAddress = JSON.parse(process.env.PUBLIC_adminList);
 
