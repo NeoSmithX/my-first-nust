@@ -7,6 +7,11 @@ export default defineNuxtConfig({
     { src: '~/plugins/polkadot-wallet.ts', mode: 'client' }, 
     
   ],
+  runtimeConfig: {
+    public:{
+      PUBLIC_adminList: process.env.PUBLIC_adminList,
+    }
+  },
   // css: ['~/assets/css/tailwind.css'],
   // build: {
   //   postcss: {

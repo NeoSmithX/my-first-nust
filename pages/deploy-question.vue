@@ -33,7 +33,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
-const adminWhitelistAddress = JSON.parse(process.env.adminList);
+// console.log('env',useRuntimeConfig())
+const adminWhitelistAddress = JSON.parse(useRuntimeConfig().public.PUBLIC_adminList);
+// const adminWhitelistAddress = JSON.parse(process.env.PUBLIC_adminList);
+
 const selectedSpace = ref('');
 const selectedQuestionId = ref('');
 const selectedQuestion = ref('');
@@ -43,9 +46,9 @@ const transactionStatus = ref(''); // 'pending', 'success', 'failed'
 const transactionHash = ref('');
 const transactionError = ref('');
 const { $polkadotApi } = useNuxtApp();
-import App from '~/app.vue'
-import { createPinia } from 'pinia';
-import { createApp } from 'vue'
+// import App from '~/app.vue'
+// import { createPinia } from 'pinia';
+// import { createApp } from 'vue'
 // const pinia = createPinia()
 // const app = createApp(App)
 // app.use(pinia)
