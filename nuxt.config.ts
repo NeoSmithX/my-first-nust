@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   plugins: [
     { src: '~/plugins/polkadot-api.ts', mode: 'client' }, // Ensures the plugin is ony exelcuted client-side
     { src: '~/plugins/polkadot-wallet.ts', mode: 'client' }, 
-    
+    { src: '~/plugins/firebase-init.ts', mode: 'client' },
   ],
   runtimeConfig: {
     public:{

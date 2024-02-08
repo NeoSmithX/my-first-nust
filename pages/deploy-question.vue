@@ -33,7 +33,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
-console.log('env',useRuntimeConfig())
+// console.log('env',useRuntimeConfig())
 const adminWhitelistAddress = JSON.parse(useRuntimeConfig().public.PUBLIC_adminList);
 // const adminWhitelistAddress = JSON.parse(process.env.PUBLIC_adminList);
 
@@ -95,6 +95,8 @@ const sendTransaction = async () => {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
                 transactionStatus.value = 'success';
                 transactionHash.value = status.asInBlock.toString();
+                // store to database
+
 
                 unsub();
             } 
