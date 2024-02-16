@@ -22,7 +22,7 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore';
 // new version
 export default defineNuxtPlugin(nuxtApp => {
   const runtimeConfig = nuxtApp.$config; // Access runtime config
-  
+  // console.log('runtimeConfig', runtimeConfig)
   const firebaseConfig = {
     apiKey: runtimeConfig.public.PUBLIC_apiKey,
     authDomain: runtimeConfig.public.PUBLIC_authDomain,
@@ -35,7 +35,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
   const myFirebase = initializeApp(firebaseConfig as any);
   const db = getFirestore(myFirebase);
-
+  // console.log('db is inited', db)
   // Provide the Firestore instance to the app
   nuxtApp.provide('db', db);
 });

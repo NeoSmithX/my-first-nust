@@ -35,7 +35,8 @@ import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
 import updateData from '~/composables/firebase/update-data'
 import type { InputFetch } from '~/types/firebase';
-const { nuxtApp } = useNuxtApp();
+import { ApiPromise, WsProvider } from '@polkadot/api'
+// const { nuxtApp } = useNuxtApp();
 // Change the file extension from .vue to .ts
 // import type { InputFetch, ReturnFetch } from '~/types/firebase';
 // console.log('env',useRuntimeConfig())
@@ -76,6 +77,10 @@ const sendTransaction = async () => {
     //     console.error('Selected account is not whitelisted.');
     //     return;
     // }
+
+    
+
+    //
     const inscriptionData = {
         p: 'drc-20-aiweb3',
         op: 'deploy-question',
@@ -85,6 +90,12 @@ const sendTransaction = async () => {
     
     const remarkPayload = JSON.stringify(inscriptionData);
 
+
+    //
+    //test
+    
+    
+    // test end
     try {
         transactionStatus.value = 'pending';
         const tx = await $polkadotApi.tx.system.remark(remarkPayload);
@@ -97,7 +108,7 @@ const sendTransaction = async () => {
             console.error('No account selected');
             return;
         }
-        const unsub = await tx.signAndSend(selectedAccount.value.address, { signer: extension.signer }, ({ status }: any) => {
+        const unsub = await tx.signAndSend(selectedAccount.value.address, { signer: extension.signer }, async ({ status }: any) => {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
                 transactionStatus.value = 'success';
@@ -116,7 +127,7 @@ const sendTransaction = async () => {
                     
                     }
                 }
-                updateData(storeData)
+                await updateData(storeData)
                 console.log('data is stored into database: ',storeData)
                 unsub();
             } 

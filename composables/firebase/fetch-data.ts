@@ -1,20 +1,21 @@
 import { collection, getDocs, query, where,doc,getDoc } from 'firebase/firestore';
 // import db from '~/plugins/firebase-init';
-import { inject } from 'vue';
+// import { inject } from 'vue';
 
 // import { defineEventHandler } from 'h3';
 import type { InputFetch, ReturnFetch } from '~/types/firebase';
 const fetchData = async (inputFetch: InputFetch): Promise<ReturnFetch> => {
-  const db = inject('db') as any;
+
+  const { $db } = useNuxtApp() as any
     const { collectionName, rowData, docId } = inputFetch;
-//   const db = getFirestore(); // Make sure to initialize Firestore
-  const collectionRef = collection(db, collectionName);
+//   const $db = getFirestore(); // Make sure to initialize Firestore
+  const collectionRef = collection($db, collectionName);
   let returnFetch: ReturnFetch = { status: false, dataArray: [] };
 
   if (docId) {
     // If docId is provided, fetch the document directly
     try {
-      const docRef = doc(db, collectionName, docId);
+      const docRef = doc($db, collectionName, docId);
       const docSnapshot = await getDoc(docRef);
       if (docSnapshot.exists()) {
         returnFetch.status = true;

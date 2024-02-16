@@ -11,27 +11,29 @@
         </NuxtLayout>
     </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
-
-const data = ref(null);
+import updateData from '~/composables/firebase/update-data'
+import fetchData from '~/composables/firebase/fetch-data';
+import type { InputFetch } from '~/types/firebase';
+const data: any = ref(null);
 const collectionName = 'aiweb3-inscription';
 const testButton = async () => {
-   
-    const response = await $fetch(
-        'api/firebase/fetch-data',
+    const x = await fetchData(
         {
-            method: 'post',
-            body: { 
-                collectionName: collectionName,
-                // docId:'Q&A',
-                rowData:{
-                    
-                }
-            }
+            collectionName: collectionName,
+            docId: 'Q&A'
         }
+
     )
-    console.log('response',response)
- 
+    console.log('x', x);
+    const storeData: InputFetch = {
+        collectionName: collectionName,
+        rowData: {
+            space: 'test',
+        }
+    }
+    await updateData(storeData)
+
 };
 </script>
