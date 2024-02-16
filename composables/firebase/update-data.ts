@@ -1,43 +1,42 @@
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '~/plugins/firebase-init';
+import { collection, getDocs, query, where, addDoc, setDoc, doc } from 'firebase/firestore';
+// import db from '~/plugins/firebase-init';
 // import { defineEventHandler } from 'h3';
+import { inject } from 'vue';
 
+import type { InputFetch, ReturnFetch } from '~/types/firebase';
+const updateData = async (args: InputFetch) => {
+    const db = inject('db') as any;
+    const collectionName = args.collectionName 
+    const docId = args.docId 
+    const rowData = args.rowData 
+    console.log('db',db)
+    const collectionRef = collection(db, collectionName) //await db.collection(collectionName).get();
+    const returnFetch: ReturnFetch = { status: false, dataArray: [] };
+    // let fetchedDocs: any = [];
 
-const updateData = async (collectionName:string,rowData:any )=>{
-   
-    const collectionRef =  collection(db,collectionName) //await db.collection(collectionName).get();
-    let fetchedDocs:any = [];
-    // const querySnapshot = await getDocs(collectionRef)
-    // console.log('querySnapshot', querySnapshot);
-    if (rowData == undefined){
-        const querySnapshot = await getDocs(collectionRef);
-        querySnapshot.forEach(doc => {
-            const docData = { id: doc.id, ...doc.data() };
-            fetchedDocs.push(docData);
-        });
-        return fetchedDocs
-    }else{
-        for (const element of rowData) {
-            const field = Object.keys(element)[0];
-            const value = element[field];
-            
-            const q = query(collectionRef, where(field, "==", value));
-            const querySnapshot = await getDocs(q);
-            
-            querySnapshot.forEach(doc => {
-                const docData = { id: doc.id, ...doc.data() };
-                // Avoid duplicates
-                if (!fetchedDocs.some((fetchedDoc: { id: string; }) => fetchedDoc.id === docData.id)) {
-                    fetchedDocs.push(docData);
-                }
-            });
+    if (docId) {
+        // Update the existing document with the provided docId
+        try {
+            await setDoc(doc(db,collectionName,docId), rowData, { merge: true });
+            // await collectionRef.doc(docId).set(rowData, { merge: true });
+            console.log(`Document with ID ${docId} updated successfully.`);
+            returnFetch.status = true
+        } catch (error) {
+            console.error('Error updating document:', error);
         }
-    
-    
-      
-        return fetchedDocs
+    } else {
+        // Add a new document and let Firestore generate the docId
+        try {
+            const docRef = await addDoc(collectionRef, rowData)
+            //await  collectionRef.add(rowData);
+            console.log(`New document added with ID ${docRef.id}.`);
+            returnFetch.status = true
+        } catch (error) {
+            console.error('Error adding new document:', error);
+        }
     }
-    
+    return returnFetch
+
 
 }
 export default updateData

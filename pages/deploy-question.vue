@@ -29,12 +29,19 @@
         </NuxtLayout>
     </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
+import updateData from '~/composables/firebase/update-data'
+import type { InputFetch } from '~/types/firebase';
+const { nuxtApp } = useNuxtApp();
+// Change the file extension from .vue to .ts
+// import type { InputFetch, ReturnFetch } from '~/types/firebase';
 // console.log('env',useRuntimeConfig())
-const adminWhitelistAddress = JSON.parse(useRuntimeConfig().public.PUBLIC_adminList);
+// import { useRuntimeConfig } from '@nuxt/runtime';
+import { useRuntimeConfig } from "#imports"
+const adminWhitelistAddress = JSON.parse((useRuntimeConfig() as any).public.PUBLIC_adminList);
 // const adminWhitelistAddress = JSON.parse(process.env.PUBLIC_adminList);
 
 const selectedSpace = ref('');
@@ -45,13 +52,8 @@ const latestBlock = ref(null);
 const transactionStatus = ref(''); // 'pending', 'success', 'failed'
 const transactionHash = ref('');
 const transactionError = ref('');
-const { $polkadotApi } = useNuxtApp();
-// import App from '~/app.vue'
-// import { createPinia } from 'pinia';
-// import { createApp } from 'vue'
-// const pinia = createPinia()
-// const app = createApp(App)
-// app.use(pinia)
+const { $polkadotApi } = useNuxtApp() as any;
+
 const walletStore = useWalletStore();
 const selectedAccount = computed(() => walletStore.selectedAccount);
 
@@ -74,33 +76,51 @@ const sendTransaction = async () => {
     //     console.error('Selected account is not whitelisted.');
     //     return;
     // }
-
-    const remarkPayload = JSON.stringify({
+    const inscriptionData = {
         p: 'drc-20-aiweb3',
         op: 'deploy-question',
         space: selectedSpace.value,
         questionId: selectedQuestion.value,
-    });
+    }
+    
+    const remarkPayload = JSON.stringify(inscriptionData);
 
     try {
         transactionStatus.value = 'pending';
         const tx = await $polkadotApi.tx.system.remark(remarkPayload);
         const wallet = walletStore.selectedWallet
-        const walletExtension = window.injectedWeb3[wallet]
+        const walletExtension = (window as any).injectedWeb3[wallet]
         const extension = await walletExtension.enable()
         // console.log('tx',tx)
         // console.log('selectedAccount',selectedAccount)
-        const unsub = await tx.signAndSend(selectedAccount.value.address, { signer: extension.signer }, ({ status }) => {
+        if (!selectedAccount.value){
+            console.error('No account selected');
+            return;
+        }
+        const unsub = await tx.signAndSend(selectedAccount.value.address, { signer: extension.signer }, ({ status }: any) => {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
                 transactionStatus.value = 'success';
                 transactionHash.value = status.asInBlock.toString();
                 // store to database
-
-
+                //
+                const storeData:InputFetch = {
+                    collectionName: 'aiweb3-inscription',
+                    rowData:{
+                        space: selectedSpace.value,
+                        // questionId: selectedQuestion.value,
+                        // question: selectedQuestion.value,
+                        blockHash: transactionHash.value,
+                        status: 'deployed',
+                        inscriptionData: inscriptionData,
+                    
+                    }
+                }
+                updateData(storeData)
+                console.log('data is stored into database: ',storeData)
                 unsub();
             } 
-        }).catch((error) => {
+        }).catch((error:any) => {
             console.error('Transaction failed:', error);
             transactionStatus.value = 'failed';
             transactionError.value = error.toString();
