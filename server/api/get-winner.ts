@@ -1,1 +1,0 @@
-const subscanKey =  process.env.SUBSCAN_KEY

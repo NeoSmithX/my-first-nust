@@ -108,23 +108,8 @@ async function submitAnswer() {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
                 transactionStatus.value = 'success';
-                transactionHash.value = status.asInBlock.toString();
-                // store to database
-                //
-                // const storeData = {
-                //     collectionName: 'aiweb3-inscription',
-                //     rowData:{
-                //         space: selectedSpace.value,
-                //         // questionId: selectedQuestion.value,
-                //         // question: selectedQuestion.value,
-                //         blockHash: transactionHash.value,
-                //         status: 'deployed',
-                //         inscriptionData: inscriptionData,
-
-                //     }
-                // }
-                // await updateData(storeData)
-                // console.log('data is stored into database: ',storeData)
+                transactionHash.value = tx.hash.toHex()
+               
                 unsub();
             }
         }).catch((error: any) => {

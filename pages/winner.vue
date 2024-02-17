@@ -1,73 +1,100 @@
 <template>
     <div>
         <NuxtLayout>
-            <div class="minting-answer">
-                <div>
-                    <label for="space-input">Enter a space:</label>
-                    <input v-model="selectedSpace" id="space-input" />
-                    <button @click="fetchQuestions" :disabled="selectedSpace == ''">Fetch Questions</button>
-                </div>
 
-                <div v-if="questions.length">
-                    <label for="question-select">Choose a Question:</label>
-                    <select v-model="selectedQuestion" id="question-select">
-                        <option v-for="question in questions" :key="question.id" :value="question.text">
-                            {{ question.text }}
-                        </option>
-                    </select>
-                </div>
+            <!-- Admin Section -->
+            <!-- <div v-if="isAdmin">
+                <h2>Admin Dashboard</h2>
+                <input v-model="spaceName" placeholder="Enter space name" />
+                <button @click="fetchQuestions">Fetch Questions</button>
+
+                <select v-model="selectedQuestion" v-if="questions.length > 0">
+                    <option disabled value="">Please select one</option>
+                    <option v-for="question in questions" :key="question.id" :value="question">
+                        {{ question.text }}
+                    </option>
+                </select>
 
                 <div v-if="selectedQuestion">
-                    <label for="answer-input">Enter your answer:</label>
-                    <input v-model="answer" id="answer-input" />
+                    <input v-model="correctAnswer" placeholder="Enter correct answer" />
+                    <input v-model.number="winnerNumber" type="number" placeholder="Enter winner number" />
+                    <button @click="createWinnerList">Create Winner</button>
                 </div>
+            </div> -->
 
-                <div>
-                    <button @click="submitAnswer" :disabled="!answer || !selectedQuestion">Submit Answer</button>
-                    <p v-if="transactionStatus === 'pending'">Transaction is pending...</p>
-                    <p v-if="transactionStatus === 'success'">Transaction successful! Hash: {{ transactionHash }}</p>
-                    <p v-if="transactionStatus === 'failed'">Transaction failed: {{ transactionError }}</p>
+            <!-- User Section -->
+            <div>
+                <h2>User Dashboard</h2>
+                <input v-model="spaceName" placeholder="Enter space name" />
+                <button @click="fetchQuestions">Fetch Questions</button>
+
+                <select v-model="selectedQuestion" v-if="questions.length > 0">
+                    <option disabled value="">Please select one</option>
+                    <option v-for="question in questions" :key="question.id" :value="question">
+                        {{ question.text }}
+                    </option>
+                </select>
+
+                <div v-if="selectedQuestion">
+                    <button @click="fetchWinnerList">Show Winner</button>
+                    <button @click="createWinnerList" :disabled='false'>Create Winner</button>
                 </div>
+                <div v-if="showWinnerInputFields">
+                    <input v-model="correctAnswer" placeholder="Correct Answer" />
+                    <input v-model.number="winnerNumber" placeholder="Winner Number" type="number" />
+                    <button @click="submitWinnerDetails">Create</button>
+                </div>
+                <div v-if="winnerList.length > 0">
+                    <h3>Winner List</h3>
+                    <ul>
+                        <li v-for="winner in winnerList" :key="winner.id">{{ winner }}</li>
+                    </ul>
+                </div>
+                <div v-else-if="winnerListFetched">Winner not existed</div>
             </div>
+
         </NuxtLayout>
     </div>
 </template>
+  
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useNuxtApp } from '#app';
-import { useWalletStore } from '~/stores/polkadot-wallet';
+//   import { createWinner, fetchWinner } from '@/api'; // Adjust the import path accordingly
 import fetchData from '~/composables/firebase/fetch-data';
-// Assume you have a composable or utility function for interacting with your blockchain and database
-//   import { fetchQuestionsForSpace, submitAnswerToBlockchain } from '~/composables/blockchain';
-
-const selectedSpace = ref('');
+import updateData from '~/composables/firebase/update-data';
+import type { InputFetch } from '~/types/firebase';
+const spaceName = ref('');
 const questions: any = ref([]);
-const selectedQuestion = ref('');
-const answer = ref('');
+const selectedQuestion = ref(null);
+const correctAnswer = ref('');
+const winnerNumber = ref(0);
+const winnerList: any = ref([]);
+const winnerListFetched = ref(false);
+const showWinnerInputFields = ref(false);
+// Dummy condition to differentiate between admin and user
+// Replace this with your actual condition
+const x = 1;
+const isAdmin = ref(x === 1); // Assuming 'x' is defined somewhere in your logic
 
-const transactionStatus = ref(''); // 'pending', 'success', 'failed'
-const transactionHash = ref('');
-const transactionError = ref('');
-const { $polkadotApi } = useNuxtApp() as any;
-
-const walletStore = useWalletStore();
-const selectedAccount = computed(() => walletStore.selectedAccount);
 async function fetchQuestions() {
     // This function should fetch questions based on the selected space
     const data = await fetchData({
         collectionName: 'aiweb3-inscription',
         rowData: {
-            space: selectedSpace.value,
+            space: spaceName.value,
         }
     });
     // console.log('data', data);
     data.dataArray.forEach((x) => {
-        // console.log('??','inscriptionData' in x.rowData)
+        // console.log('hash:', (x.rowData as any).deployHash)
         if ('inscriptionData' in x.rowData) {
 
             if ((x.rowData.inscriptionData as any).op == 'deploy-question' && (x.rowData.inscriptionData as any).p == 'drc-20-aiweb3') {
                 questions.value.push({
-                    text: (x.rowData.inscriptionData as any).question, id: x.docId
+                    text: (x.rowData.inscriptionData as any).question,
+                    id: x.docId,
+                    deployHash: (x.rowData as any).deployHash,
+                    winnerList: (x.rowData as any).winnerList
                 })
 
             }
@@ -82,60 +109,58 @@ async function fetchQuestions() {
     // questions.value = await fetchQuestionsForSpace(selectedSpace.value);
 }
 
-async function submitAnswer() {
-    const inscriptionData = {
-        p: 'drc-20-aiweb3',
-        op: 'mint-answer',
-        space: selectedSpace.value,
-        question: selectedQuestion.value,
-        answer: answer.value
+async function createWinnerList() {
+    showWinnerInputFields.value = true;
+}
+async function submitWinnerDetails() {
+    if (!selectedQuestion.value || !correctAnswer.value || !winnerNumber.value) {
+        alert('Please fill all fields');
+        return;
     }
+    const body = {
+        network: 'astar',
+        deployHash: (selectedQuestion.value as any).deployHash,
+        correctAnwser: correctAnswer.value,
+        winnerNum: winnerNumber.value
+    }
+    // console.log('selectedQuestion',selectedQuestion)
+    // console.log('body', body);
+    const response = await fetch('/api/subscan/get-winner', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+    const winner = await response.json();
+    console.log('winner', winner);
 
-    const remarkPayload = JSON.stringify(inscriptionData);
-    try {
-        transactionStatus.value = 'pending';
-        const tx = await $polkadotApi.tx.system.remark(remarkPayload);
-        const wallet = walletStore.selectedWallet
-        const walletExtension = (window as any).injectedWeb3[wallet]
-        const extension = await walletExtension.enable()
-        // console.log('tx',tx)
-        // console.log('selectedAccount',selectedAccount)
-        if (!selectedAccount.value) {
-            console.error('No account selected');
-            return;
+    // store to database
+    const storeData: InputFetch = {
+        collectionName: 'aiweb3-inscription',
+        docId: (selectedQuestion.value as any).id,
+        rowData:{
+            winnerList: winner.winnerList,
         }
-        const unsub = await tx.signAndSend(selectedAccount.value.address, { signer: extension.signer }, async ({ status }: any) => {
-            if (status.isInBlock) {
-                console.log(`Transaction included at blockHash ${status.asInBlock}`);
-                transactionStatus.value = 'success';
-                transactionHash.value = status.asInBlock.toString();
-                // store to database
-                //
-                // const storeData = {
-                //     collectionName: 'aiweb3-inscription',
-                //     rowData:{
-                //         space: selectedSpace.value,
-                //         // questionId: selectedQuestion.value,
-                //         // question: selectedQuestion.value,
-                //         blockHash: transactionHash.value,
-                //         status: 'deployed',
-                //         inscriptionData: inscriptionData,
-
-                //     }
-                // }
-                // await updateData(storeData)
-                // console.log('data is stored into database: ',storeData)
-                unsub();
-            }
-        }).catch((error: any) => {
-            console.error('Transaction failed:', error);
-            transactionStatus.value = 'failed';
-            transactionError.value = error.toString();
-        });
-
-    } catch (error) {
-        console.error('Transaction failed:', error);
     }
+    await updateData(storeData)
+}
+async function fetchWinnerList() {
+    if ((selectedQuestion.value as any).winnerList) {
+        winnerList.value = (selectedQuestion.value as any).winnerList;
+        console.log('winnerList', selectedQuestion.value);
+    }
+    // if (!selectedQuestion.value) {
+    //     alert('Please select a question');
+    //     return;
+    // }
+    // Assuming fetchWinner function takes the space name and question
+    // winnerList.value = await fetchWinner(spaceName.value, selectedQuestion.value);
+    winnerListFetched.value = true;
 }
 </script>
+  
+<style scoped>
+/* Add your styles here */
+</style>
   

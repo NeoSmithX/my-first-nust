@@ -98,7 +98,8 @@ const sendTransaction = async () => {
             if (status.isInBlock) {
                 console.log(`Transaction included at blockHash ${status.asInBlock}`);
                 transactionStatus.value = 'success';
-                transactionHash.value = status.asInBlock.toString();
+                // status.asInBlock.toString() is the block hash
+                transactionHash.value = tx.hash.toHex()
                 // store to database
                 //
                 const storeData:InputFetch = {
@@ -107,7 +108,7 @@ const sendTransaction = async () => {
                         space: selectedSpace.value,
                         // questionId: selectedQuestion.value,
                         // question: selectedQuestion.value,
-                        blockHash: transactionHash.value,
+                        deployHash: transactionHash.value,
                         status: 'deployed',
                         inscriptionData: inscriptionData,
                     
