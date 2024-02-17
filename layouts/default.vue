@@ -10,8 +10,9 @@
             <br><br>
             <nav>
                 <NuxtLink to="/" class="nav-button">Home</NuxtLink> &nbsp;
-                <NuxtLink to="/deploy-question" class="nav-button">Deploy</NuxtLink> &nbsp;
                 <NuxtLink to="/mint-answer" class="nav-button">Mint</NuxtLink> &nbsp;
+                <NuxtLink to="/deploy-question" class="nav-button">Deploy</NuxtLink> &nbsp;
+                <NuxtLink to="/winner" class="nav-button">Winner Dashboard</NuxtLink> &nbsp;
                 <NuxtLink to="/test" class="nav-button">Test Code</NuxtLink> &nbsp;
             </nav>
 
@@ -25,7 +26,7 @@
         <!-- </main> -->
         <footer>
 
-            <p>&copy; 2024 Simple Inscritpion by Neo</p>
+            <p>&copy; 2024 Inscritpion App by Aiweb3 (Neo)</p>
         </footer>
     </div>
 </template>

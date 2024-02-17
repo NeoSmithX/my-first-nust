@@ -17,7 +17,7 @@
                 </div>
 
                 <div>
-                    <button @click="sendTransaction" :disabled="transactionStatus === 'pending' || !selectedSpace || !selectedQuestion">Deploy Question
+                    <button @click="sendTransaction" :disabled="transactionStatus === 'pending' || !selectedSpace || !selectedQuestion || !selectedAccount">Deploy Question
                         <!-- !isWhitelisted || -->
                     </button>
 
@@ -73,29 +73,15 @@ onMounted(() => {
 });
 
 const sendTransaction = async () => {
-    // if (!isWhitelisted.value) {
-    //     console.error('Selected account is not whitelisted.');
-    //     return;
-    // }
-
-    
-
-    //
+   
     const inscriptionData = {
         p: 'drc-20-aiweb3',
         op: 'deploy-question',
         space: selectedSpace.value,
-        questionId: selectedQuestion.value,
+        question: selectedQuestion.value,
     }
     
     const remarkPayload = JSON.stringify(inscriptionData);
-
-
-    //
-    //test
-    
-    
-    // test end
     try {
         transactionStatus.value = 'pending';
         const tx = await $polkadotApi.tx.system.remark(remarkPayload);
