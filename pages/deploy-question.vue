@@ -33,7 +33,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useNuxtApp } from '#app';
 import { useWalletStore } from '~/stores/polkadot-wallet';
+// import updateData from '~/composables/firebase/update-data'
 import updateData from '~/composables/firebase/update-data'
+
+
+
 import type { InputFetch } from '~/types/firebase';
 import { ApiPromise, WsProvider } from '@polkadot/api'
 // const { nuxtApp } = useNuxtApp();

@@ -6,9 +6,7 @@ import type { CollectionReference, DocumentData, Query } from '@google-cloud/fir
 
 
 export default defineEventHandler(async (event) : Promise<ReturnFetch> => {
-  // console.log('event', event)
-  // Access query parameters
-  // return 'Hello World'
+
   const returnFetch: ReturnFetch = {
     status: false,
     dataArray: []
@@ -65,51 +63,6 @@ export default defineEventHandler(async (event) : Promise<ReturnFetch> => {
     }
   }
   return returnFetch
-
-
-
-
-
-
-  ////////////////
-  // if (docId) {
-  //   const docRef = db.collection(collectionName).doc(docId);
-  //   const doc = await docRef.get();
-  //   if (!doc.exists) {
-  //     console.log('No such document!');
-  //   } else {
-  //     console.log('Document data:', doc.data());
-  //     return doc.data();
-  //   }
-  // }
-  // const collectionRef = db.collection(collectionName)// collection(db,collectionName) //await db.collection(collectionName).get();
-  // const fetchedDocs: any = [];
-  // if (rowData == undefined) {
-  //   const snapshot = await collectionRef.get();
-  //   snapshot.forEach(doc => {
-  //     fetchedDocs.push(doc.data());
-  //   });
-  //   return fetchedDocs; // Return all documents in the collection
-  // }
-
-
-  // for (const fieldName of Object.keys(rowData) ) {
-  //   // const fieldName = Object.keys(queryField)[0]; // Get the field name
-  //   const fieldValue = rowData[fieldName]; // Get the corresponding value
-
-  //   const snapshot = await collectionRef.where(fieldName, '==', fieldValue).get();
-
-  //   if (!snapshot.empty) {
-  //     snapshot.forEach(doc => {
-  //       fetchedDocs.push(doc.data());
-  //     });
-  //   } else {
-  //     console.log(`No document found with ${fieldName} == ${fieldValue}`);
-  //   }
-  // }
-
-  // return fetchedDocs;
-
 
 })
 // the body has property {
